@@ -1,0 +1,29 @@
+{
+  "name": "shadow-agents",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shadow Agent framework: always-on voxel sprite agents with a permission gateway, tool forge, MCP and A2A.",
+  "license": "MIT",
+  "workspaces": [
+    "server",
+    "app"
+  ],
+  "scripts": {
+    "server": "npm run start -w server",
+    "server:dev": "npm run dev -w server",
+    "app": "npm run start -w app",
+    "app:dev": "npm run dev -w app",
+    "build": "npm run build -w app",
+    "dev": "concurrently -k -n server,app -c magenta,cyan \"npm run server:dev\" \"npm run app:dev\"",
+    "test": "npm run test -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w app",
+    "up": "docker compose up -d --build",
+    "down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
+  },
+  "engines": {
+    "node": ">=24"
+  }
+}

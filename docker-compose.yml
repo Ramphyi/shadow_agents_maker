@@ -1,0 +1,27 @@
+# docker compose up -d      starts the server; it keeps running (and restarts with Docker) until you stop it.
+# The desktop app finds it on http://127.0.0.1:7777 and reads the admin token from ~/.shadowagent.
+services:
+  shadow:
+    build: .
+    image: shadow-agents:latest
+    container_name: shadow-agents
+    restart: unless-stopped
+    # One container needs no network of its own; the default bridge also avoids exhausting Docker's address pools.
+    network_mode: bridge
+    user: "${SHADOW_UID:-1000}:${SHADOW_GID:-1000}"
+    ports:
+      # Bound to this machine only. To reach it from elsewhere, put a tunnel in front; do not widen this.
+      - "127.0.0.1:${SHADOW_PORT:-7777}:7777"
+    volumes:
+      - ${SHADOW_HOME:-${HOME}/.shadowagent}:/data
+    environment:
+      # Optional: any of these creates an AI provider on first start. You can also add providers in the app.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+      # A model server on the host (Ollama, LM Studio) is reachable from the container at this address.
+      SHADOW_OLLAMA_URL: ${SHADOW_OLLAMA_URL:-http://host.docker.internal:11434}
+      SHADOW_PUBLIC_URL: ${SHADOW_PUBLIC_URL:-http://127.0.0.1:${SHADOW_PORT:-7777}}
+      TZ: ${TZ:-UTC}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
